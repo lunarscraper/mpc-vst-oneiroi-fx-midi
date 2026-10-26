@@ -13,7 +13,7 @@ jobs:
     with:
       tools_ref: 28da1ce2a75f33b5ef802d0fadb0293862aed8a5
       tag: oneiroi-vst-dev
-      version: 1.1.0-dev
+      version: 1.1.0
       vst_dir: vst
       build: '"$MPC_VST/tools/build_port.sh" vst/vst.json armv7'
       host_test: '"$MPC_VST/tools/test_port.sh" vst/vst.json'
@@ -27,7 +27,7 @@ jobs:
     with:
       tools_ref: 28da1ce2a75f33b5ef802d0fadb0293862aed8a5
       tag: oneiroi-fx-vst-dev
-      version: 1.1.0-dev
+      version: 1.1.0
       vst_dir: vst-fx
       build: '"$MPC_VST/tools/build_port.sh" vst-fx/vst.json armv7'
       host_test: '"$MPC_VST/tools/test_port.sh" vst-fx/vst.json'
