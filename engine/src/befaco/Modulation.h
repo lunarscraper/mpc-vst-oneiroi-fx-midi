@@ -24,6 +24,7 @@ private:
 
     ModulationSource source_;
     MorphingOscillator* lfo_;
+    Oscillator* shapes_[NOF_SHAPES];   // the LFO's shapes, kept to free them (MorphingOscillator does not own them)
 
     Schmitt resetTrigger_, speedResetTrigger_, typeResetTrigger_;
 
@@ -46,13 +47,17 @@ public:
         source_ = ModulationSource::MOD_SOURCE_LFO;
 
         lfo_ = MorphingOscillator::create(NOF_SHAPES, patchState_->blockSize);
-        lfo_->setOscillator(LORENZ, LorenzAttractor::create(patchState_->blockRate));
-        lfo_->setOscillator(SINE, PhaseShiftOscillator<SineOscillator>::create(0, patchState_->blockRate));
-        lfo_->setOscillator(INVERTED_RAMP, PhaseShiftOscillator<InvertedRampOscillator>::create(0, patchState_->blockRate));
-        lfo_->setOscillator(RAMP, PhaseShiftOscillator<RampOscillator>::create(0, patchState_->blockRate));
-        lfo_->setOscillator(SQUARE, PhaseShiftOscillator<SquareWaveOscillator>::create(0, patchState_->blockRate));
-        lfo_->setOscillator(SH, NoiseOscillator::create(patchState_->blockRate));
-        lfo_->setOscillator(EF, EnvelopeFollowerMod::create(patchCtrls_, patchState_));
+        shapes_[LORENZ] = LorenzAttractor::create(patchState_->blockRate);
+        shapes_[SINE] = PhaseShiftOscillator<SineOscillator>::create(0, patchState_->blockRate);
+        shapes_[INVERTED_RAMP] = PhaseShiftOscillator<InvertedRampOscillator>::create(0, patchState_->blockRate);
+        shapes_[RAMP] = PhaseShiftOscillator<RampOscillator>::create(0, patchState_->blockRate);
+        shapes_[SQUARE] = PhaseShiftOscillator<SquareWaveOscillator>::create(0, patchState_->blockRate);
+        shapes_[SH] = NoiseOscillator::create(patchState_->blockRate);
+        shapes_[EF] = EnvelopeFollowerMod::create(patchCtrls_, patchState_);
+        for (int i = 0; i < NOF_SHAPES; i++)
+        {
+            lfo_->setOscillator(i, shapes_[i]);
+        }
         lfo_->setFrequency(kInternalClockFreq);
         lfo_->morph(0.f);
 
@@ -68,6 +73,10 @@ public:
     ~Modulation()
     {
         MorphingOscillator::destroy(lfo_);
+        for (int i = 0; i < NOF_SHAPES; i++)
+        {
+            delete shapes_[i];   // Oscillator has a virtual destructor
+        }
     }
 
     static Modulation* create(PatchCtrls* patchCtrls, PatchCvs* patchCvs, PatchState* patchState)

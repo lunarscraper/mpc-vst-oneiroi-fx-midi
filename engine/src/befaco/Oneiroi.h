@@ -104,6 +104,8 @@ public:
         Ambience::destroy(ambience_);
         Modulation::destroy(modulation_);
         Limiter::destroy(limiter_);
+        StereoDcBlockingFilter::destroy(inputDcFilter_);
+        StereoDcBlockingFilter::destroy(outputDcFilter_);
 
         for (size_t i = 0; i < 2; i++)
         {

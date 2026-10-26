@@ -146,6 +146,7 @@ public:
         {
             WriteHead::destroy(writeHeads_[i]);
         }
+        FloatArray::destroy(buffer_);
     }
 
     static LooperBuffer* create()

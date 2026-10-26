@@ -6,6 +6,7 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 : "${WASI_SDK:?set WASI_SDK}" "${MPC_VST:?set MPC_VST}"
+mkdir -p build
 "$WASI_SDK/bin/clang++" --target=wasm32-wasi --sysroot="$WASI_SDK/share/wasi-sysroot" -O2 -std=gnu++17 \
   -fno-exceptions -fvisibility=hidden -Wno-inconsistent-missing-override -mexec-model=reactor -msimd128 \
   -DNDEBUG -DONEIROI_PORTABLE_MINMAX -DONEIROI_INPUT \

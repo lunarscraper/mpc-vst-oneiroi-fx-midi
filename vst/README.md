@@ -48,7 +48,7 @@ Dieselbe Engine gibt es mit dem Audioeingang des Moduls als Insert-Effekt: `../v
 - Kein RANDOM-Taster mit seinen Schaltern (dafür Presets), keine am Modul gespeicherten Einstellungen, kein MIDI-Ausgang.
 - Die Mod-Stärken sind einpolig (0 bis 100 %), wie in der Grundeinstellung des Moduls.
 - Ausgang um 6 dB angehoben, mit weichem Knie vor der Vollaussteuerung.
-- Vier kleine Änderungen am Originalcode (`upstream-changes.diff`): zwei ARMv8-Befehle abschaltbar, das Echo folgt einem geänderten Tempo, und zwei Lesezugriffe bleiben im Puffer. Die letzten beiden hat der Stresstest gefunden: Bestimmte Mod-Stärken ließen Resonator und Hall außerhalb ihrer Puffer lesen, was in einem Plugin die Force-Software mitgerissen hätte.
+- Kleine Änderungen am Originalcode (`upstream-changes.diff`): zwei ARMv8-Befehle abschaltbar, das Echo folgt einem geänderten Tempo, zwei Lesezugriffe bleiben im Puffer, und drei Destruktoren geben jetzt allen Speicher frei (am Modul wird der Patch nie entladen, in der Force bei jedem Entfernen von der Spur). Die letzten beiden hat der Stresstest gefunden: Bestimmte Mod-Stärken ließen Resonator und Hall außerhalb ihrer Puffer lesen, was in einem Plugin die Force-Software mitgerissen hätte.
 
 ## Stand
 
