@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="784" height="304" viewBox="0 0 784 304">
+<text x="392" y="100" text-anchor="middle" style="font-family:var(--font);font-weight:700;font-size:21px;letter-spacing:0.08em;fill:var(--accent-hi)">RECORD ON, PLAY, RECORD OFF: UP TO 5.4 S</text>
+<text x="392" y="136" text-anchor="middle" style="font-family:var(--font);font-weight:600;font-size:17px;letter-spacing:0.08em;fill:var(--ink-dim)">IT STARTS FULL OF NOISE; CLEAR EMPTIES IT</text>
+<text x="392" y="172" text-anchor="middle" style="font-family:var(--font);font-weight:600;font-size:17px;letter-spacing:0.08em;fill:var(--ink-dim)">OSC 2 = WAVETABLE READS THE SAME RECORDING</text>
+<text x="392" y="208" text-anchor="middle" style="font-family:var(--font);font-weight:600;font-size:17px;letter-spacing:0.08em;fill:var(--ink-dim)">SYNC: MPC'S TEMPO AS THE CLOCK IN SYNC IN</text>
+</svg>

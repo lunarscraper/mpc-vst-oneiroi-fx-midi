@@ -1,0 +1,20 @@
+{
+ "presets": [
+  {"name": "Init", "values": {}},
+  {"name": "Dream Pad", "values": {"sine_vol": 0.7, "osc2_vol": 0.6, "detune": 0.35, "filter_vol": 1.0, "cutoff": 0.5, "resonance": 0.3, "echo_vol": 0.4, "ambience_vol": 0.8, "decay": 0.8, "spacetime": 0.5, "attack": 0.6, "release": 0.7, "mod_level": 0.4, "mod_speed": 0.3, "mod_type": "SINE", "mod_cutoff": 0.4, "volume": 0.55}},
+  {"name": "Shimmer Drone", "values": {"play": "DRONE", "octave": 3, "unison": 0.5, "sine_vol": 0.7, "osc2_vol": 0.4, "reso_vol": 0.4, "reso_tune": 0.6, "reso_feedback": 0.7, "echo_vol": 0.6, "echo_repeats": 0.8, "ambience_vol": 1.0, "decay": 0.95, "spacetime": 0.7}},
+  {"name": "Reverse Clouds", "values": {"sine_vol": 0.6, "osc2_vol": 0.4, "ambience_vol": 1.0, "decay": 0.8, "spacetime": -0.7, "echo_vol": 0.3, "attack": 0.5, "release": 0.7, "volume": 0.55}},
+  {"name": "Resonator Bells", "values": {"sine_vol": 1.0, "osc2_vol": 0.0, "filter_vol": 0.0, "reso_vol": 1.0, "reso_tune": 0.7, "reso_feedback": 0.85, "dissonance": 0.3, "echo_vol": 0.3, "ambience_vol": 0.5, "attack": 0.0, "release": 0.4, "volume": 1.0}},
+  {"name": "Comb Machine", "values": {"sine_vol": 0.2, "osc2_vol": 0.8, "filter_vol": 1.0, "filter_mode": "COMB", "cutoff": 0.4, "resonance": 0.8, "sync": "BEAT", "mod_level": 0.6, "mod_speed": 0.6, "mod_type": "RAMP", "mod_cutoff": 0.6, "echo_vol": 0.3, "ambience_vol": 0.3, "attack": 0.1, "volume": 0.9}},
+  {"name": "Supersaw Wall", "values": {"octave": 3, "sine_vol": 0.3, "osc2_vol": 1.0, "detune": 0.6, "filter_vol": 1.0, "cutoff": 0.7, "resonance": 0.1, "echo_vol": 0.2, "ambience_vol": 0.6, "attack": 0.1, "release": 0.5, "volume": 0.7}},
+  {"name": "Tempo Echo", "values": {"sync": "BEAT", "sine_vol": 0.9, "osc2_vol": 0.3, "echo_vol": 0.6, "echo_repeats": 0.7, "echo_density": 0.75, "ambience_vol": 0.3, "attack": 0.0, "release": 0.2, "mod_level": 0.3, "mod_speed": 0.45, "mod_detune": 0.3}},
+  {"name": "Chaos Drift", "values": {"play": "DRONE", "sine_vol": 0.6, "osc2_vol": 0.6, "filter_vol": 1.0, "filter_mode": "BANDPASS", "cutoff": 0.5, "resonance": 0.5, "mod_level": 0.8, "mod_speed": 0.4, "mod_type": "CHAOS", "mod_pitch": 0.15, "mod_cutoff": 0.7, "mod_density": 0.3, "mod_spacetime": 0.4, "echo_vol": 0.5, "ambience_vol": 0.7, "volume": 1.0}},
+  {"name": "Noise Loop", "values": {"play": "DRONE", "sine_vol": 0.0, "osc2_vol": 0.0, "looper_vol": 0.7, "looper_speed": 0.5, "looper_length": 0.2, "looper_filter": -0.4, "filter_vol": 1.0, "filter_mode": "BANDPASS", "cutoff": 0.55, "resonance": 0.6, "echo_vol": 0.4, "ambience_vol": 0.7, "decay": 0.8, "mod_level": 0.5, "mod_speed": 0.35, "mod_cutoff": 0.5, "mod_start": 0.3, "volume": 0.45}},
+  {"name": "Wavetable Grit", "values": {"osc2_type": "WAVETABLE", "sine_vol": 0.3, "osc2_vol": 0.9, "detune": 0.3, "filter_vol": 1.0, "cutoff": 0.55, "resonance": 0.4, "echo_vol": 0.3, "ambience_vol": 0.5, "mod_level": 0.4, "mod_speed": 0.4, "mod_detune": 0.5, "volume": 0.7}},
+  {"name": "Sub Drone", "values": {"play": "DRONE", "octave": 2, "unison": -1.0, "sine_vol": 1.0, "osc2_vol": 0.3, "filter_vol": 1.0, "cutoff": 0.35, "echo_vol": 0.2, "ambience_vol": 0.5, "decay": 0.7, "volume": 0.95}},
+  {"name": "Auto Pan Space", "values": {"sync": "BEAT", "sine_vol": 0.7, "osc2_vol": 0.5, "ambience_vol": 1.0, "decay": 0.75, "spacetime": 0.4, "autopan": 0.6, "echo_vol": 0.3, "attack": 0.4, "release": 0.6}},
+  {"name": "Infinite Echo", "values": {"sine_vol": 0.8, "osc2_vol": 0.2, "echo_vol": 0.8, "echo_repeats": 1.0, "echo_density": 0.6, "echo_filter": 0.3, "ambience_vol": 0.4, "attack": 0.0, "release": 0.3, "volume": 0.7}},
+  {"name": "Breathing Filter", "values": {"sine_vol": 0.5, "osc2_vol": 0.8, "filter_vol": 1.0, "cutoff": 0.3, "resonance": 0.5, "mod_level": 0.8, "mod_speed": 0.35, "mod_type": "SINE", "mod_cutoff": 0.8, "echo_vol": 0.3, "ambience_vol": 0.6, "attack": 0.4, "release": 0.6}},
+  {"name": "Dissonant Choir", "values": {"unison": 0.26, "sine_vol": 0.8, "osc2_vol": 0.4, "reso_vol": 0.7, "reso_tune": 0.55, "reso_feedback": 0.8, "dissonance": 0.8, "echo_vol": 0.3, "ambience_vol": 0.9, "decay": 0.85, "attack": 0.5, "release": 0.7}}
+ ]
+}

@@ -1,0 +1,36 @@
+{
+  "name": "[FX] Oneiroi FX",
+  "vendor": "Befaco",
+  "uid": "BfOx",
+  "version": 1100,
+  "so": "oneiroi_fx.so",
+  "presets": "presets.json",
+  "effect": true,
+  "defines": {
+    "HAS_SONG_POS": 1
+  },
+  "build": {
+    "root": "..",
+    "sources": [
+      "engine/mpc/oneiroi_engine.cc"
+    ],
+    "cflags": [
+      "-Iengine/mpc",
+      "-Iengine/src/befaco",
+      "-Iengine/src/owl/LibSource",
+      "-Iengine/src/owl/Source",
+      "-std=gnu++17",
+      "-DNDEBUG",
+      "-DONEIROI_PORTABLE_MINMAX",
+      "-DONEIROI_INPUT",
+      "-DONEIROI_MIDI_PORT"
+    ],
+    "libs": [
+      "-lm",
+      "-ldl"
+    ]
+  },
+  "params": "params.json",
+  "layout": "layout.conf",
+  "art": "html"
+}

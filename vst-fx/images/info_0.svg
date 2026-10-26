@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="626" height="304" viewBox="0 0 626 304">
+<text x="313" y="100" text-anchor="middle" style="font-family:var(--font);font-weight:700;font-size:21px;letter-spacing:0.08em;fill:var(--accent-hi)">IN VOL = THE INPUT FADER</text>
+<text x="313" y="136" text-anchor="middle" style="font-family:var(--font);font-weight:600;font-size:17px;letter-spacing:0.08em;fill:var(--ink-dim)">LOOP SOURCE: WHAT RECORD TAKES</text>
+<text x="313" y="172" text-anchor="middle" style="font-family:var(--font);font-weight:600;font-size:17px;letter-spacing:0.08em;fill:var(--ink-dim)">NOTES: MIDI TRACK → ONEIROI FX MIDI IN</text>
+</svg>

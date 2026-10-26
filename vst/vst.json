@@ -1,0 +1,32 @@
+{
+  "name": "[SYN] Oneiroi",
+  "vendor": "Befaco",
+  "uid": "BfOn",
+  "version": 1100,
+  "so": "oneiroi.so",
+  "presets": "presets.json",
+  "defines": {
+    "HAS_SONG_POS": 1
+  },
+  "build": {
+    "root": "..",
+    "sources": [
+      "engine/mpc/oneiroi_engine.cc"
+    ],
+    "cflags": [
+      "-Iengine/mpc",
+      "-Iengine/src/befaco",
+      "-Iengine/src/owl/LibSource",
+      "-Iengine/src/owl/Source",
+      "-std=gnu++17",
+      "-DNDEBUG",
+      "-DONEIROI_PORTABLE_MINMAX"
+    ],
+    "libs": [
+      "-lm"
+    ]
+  },
+  "params": "params.json",
+  "layout": "layout.conf",
+  "art": "html"
+}

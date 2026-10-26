@@ -1,0 +1,466 @@
+{
+ "name": "[SYN] Oneiroi",
+ "params": [
+  {
+   "key": "tune",
+   "name": "TUNE",
+   "min": -6,
+   "max": 6,
+   "default": 0,
+   "dynamic_display": true
+  },
+  {
+   "key": "octave",
+   "name": "OCTAVE",
+   "min": 1,
+   "max": 8,
+   "default": 4,
+   "display": "int"
+  },
+  {
+   "key": "detune",
+   "name": "DETUNE",
+   "min": 0,
+   "max": 1,
+   "default": 0.2,
+   "dynamic_display": true
+  },
+  {
+   "key": "unison",
+   "name": "UNISON",
+   "min": -1,
+   "max": 1,
+   "default": 0,
+   "dynamic_display": true
+  },
+  {
+   "key": "osc2_type",
+   "name": "OSC 2",
+   "options": [
+    "SUPERSAW",
+    "WAVETABLE"
+   ],
+   "default": 0
+  },
+  {
+   "key": "sine_vol",
+   "name": "SINE VOL",
+   "min": 0,
+   "max": 1,
+   "default": 0.7,
+   "dynamic_display": true
+  },
+  {
+   "key": "osc2_vol",
+   "name": "OSC 2 VOL",
+   "min": 0,
+   "max": 1,
+   "default": 0.5,
+   "dynamic_display": true
+  },
+  {
+   "key": "looper_vol",
+   "name": "LOOPER VOL",
+   "min": 0,
+   "max": 1,
+   "default": 0,
+   "dynamic_display": true
+  },
+  {
+   "key": "looper_speed",
+   "name": "SPEED",
+   "min": -2,
+   "max": 2,
+   "default": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "looper_start",
+   "name": "START",
+   "min": 0.0,
+   "max": 1.0,
+   "default": 0.0,
+   "dynamic_display": true
+  },
+  {
+   "key": "looper_length",
+   "name": "LENGTH",
+   "min": 0,
+   "max": 1,
+   "default": 1,
+   "dynamic_display": true
+  },
+  {
+   "key": "looper_sos",
+   "name": "SOS",
+   "min": 0.0,
+   "max": 1.0,
+   "default": 0.0,
+   "dynamic_display": true
+  },
+  {
+   "key": "looper_filter",
+   "name": "LOOP FILTER",
+   "min": -1,
+   "max": 1,
+   "default": 0,
+   "dynamic_display": true
+  },
+  {
+   "key": "record",
+   "name": "RECORD",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 0
+  },
+  {
+   "key": "clear",
+   "name": "CLEAR",
+   "options": [
+    "-",
+    "GO"
+   ],
+   "default": 0,
+   "momentary": true
+  },
+  {
+   "key": "filter_vol",
+   "name": "FILTER VOL",
+   "min": 0,
+   "max": 1,
+   "default": 0.7,
+   "dynamic_display": true
+  },
+  {
+   "key": "cutoff",
+   "name": "CUTOFF",
+   "min": 0,
+   "max": 1,
+   "default": 0.6,
+   "dynamic_display": true
+  },
+  {
+   "key": "resonance",
+   "name": "RESONANCE",
+   "min": 0,
+   "max": 1,
+   "default": 0.2,
+   "dynamic_display": true
+  },
+  {
+   "key": "filter_mode",
+   "name": "FILTER MODE",
+   "options": [
+    "LOWPASS",
+    "BANDPASS",
+    "HIGHPASS",
+    "COMB"
+   ],
+   "default": 0
+  },
+  {
+   "key": "reso_vol",
+   "name": "RESO VOL",
+   "min": 0.0,
+   "max": 1.0,
+   "default": 0.0,
+   "dynamic_display": true
+  },
+  {
+   "key": "reso_tune",
+   "name": "RESO TUNE",
+   "min": 0,
+   "max": 1,
+   "default": 0.5,
+   "dynamic_display": true
+  },
+  {
+   "key": "reso_feedback",
+   "name": "RESO FDBK",
+   "min": 0,
+   "max": 1,
+   "default": 0.5,
+   "dynamic_display": true
+  },
+  {
+   "key": "dissonance",
+   "name": "DISSONANCE",
+   "min": 0.0,
+   "max": 1.0,
+   "default": 0.0,
+   "dynamic_display": true
+  },
+  {
+   "key": "echo_vol",
+   "name": "ECHO VOL",
+   "min": 0,
+   "max": 1,
+   "default": 0.25,
+   "dynamic_display": true
+  },
+  {
+   "key": "echo_density",
+   "name": "DENSITY",
+   "min": 0,
+   "max": 1,
+   "default": 0.5,
+   "dynamic_display": true
+  },
+  {
+   "key": "echo_repeats",
+   "name": "REPEATS",
+   "min": 0,
+   "max": 1,
+   "default": 0.5,
+   "dynamic_display": true
+  },
+  {
+   "key": "echo_filter",
+   "name": "ECHO FILTER",
+   "min": -1,
+   "max": 1,
+   "default": 0,
+   "dynamic_display": true
+  },
+  {
+   "key": "ambience_vol",
+   "name": "AMB VOL",
+   "min": 0,
+   "max": 1,
+   "default": 0.5,
+   "dynamic_display": true
+  },
+  {
+   "key": "spacetime",
+   "name": "SPACETIME",
+   "min": -1,
+   "max": 1,
+   "default": 0.3,
+   "dynamic_display": true
+  },
+  {
+   "key": "decay",
+   "name": "DECAY",
+   "min": 0,
+   "max": 1,
+   "default": 0.6,
+   "dynamic_display": true
+  },
+  {
+   "key": "autopan",
+   "name": "AUTO PAN",
+   "min": 0.0,
+   "max": 1.0,
+   "default": 0.0,
+   "dynamic_display": true
+  },
+  {
+   "key": "mod_level",
+   "name": "MOD LEVEL",
+   "min": 0.0,
+   "max": 1.0,
+   "default": 0.0,
+   "dynamic_display": true
+  },
+  {
+   "key": "mod_speed",
+   "name": "MOD SPEED",
+   "min": 0,
+   "max": 1,
+   "default": 0.5,
+   "dynamic_display": true
+  },
+  {
+   "key": "mod_type",
+   "name": "MOD TYPE",
+   "options": [
+    "CHAOS",
+    "SINE",
+    "RAMP",
+    "SAW",
+    "SQUARE",
+    "RANDOM",
+    "ENVELOPE"
+   ],
+   "default": 1
+  },
+  {
+   "key": "mod_pitch",
+   "name": "MOD>PITCH",
+   "min": 0,
+   "max": 1,
+   "default": 0,
+   "dynamic_display": true
+  },
+  {
+   "key": "mod_detune",
+   "name": "MOD>DETUNE",
+   "min": 0,
+   "max": 1,
+   "default": 0,
+   "dynamic_display": true
+  },
+  {
+   "key": "mod_speed_amt",
+   "name": "MOD>SPEED",
+   "min": 0,
+   "max": 1,
+   "default": 0,
+   "dynamic_display": true
+  },
+  {
+   "key": "mod_start",
+   "name": "MOD>START",
+   "min": 0,
+   "max": 1,
+   "default": 0,
+   "dynamic_display": true
+  },
+  {
+   "key": "mod_length",
+   "name": "MOD>LENGTH",
+   "min": 0,
+   "max": 1,
+   "default": 0,
+   "dynamic_display": true
+  },
+  {
+   "key": "mod_cutoff",
+   "name": "MOD>CUTOFF",
+   "min": 0,
+   "max": 1,
+   "default": 0.5,
+   "dynamic_display": true
+  },
+  {
+   "key": "mod_resonance",
+   "name": "MOD>RESO",
+   "min": 0,
+   "max": 1,
+   "default": 0,
+   "dynamic_display": true
+  },
+  {
+   "key": "mod_reso_tune",
+   "name": "MOD>R TUNE",
+   "min": 0,
+   "max": 1,
+   "default": 0,
+   "dynamic_display": true
+  },
+  {
+   "key": "mod_feedback",
+   "name": "MOD>R FDBK",
+   "min": 0,
+   "max": 1,
+   "default": 0,
+   "dynamic_display": true
+  },
+  {
+   "key": "mod_density",
+   "name": "MOD>DENSITY",
+   "min": 0,
+   "max": 1,
+   "default": 0,
+   "dynamic_display": true
+  },
+  {
+   "key": "mod_repeats",
+   "name": "MOD>REPEATS",
+   "min": 0,
+   "max": 1,
+   "default": 0,
+   "dynamic_display": true
+  },
+  {
+   "key": "mod_spacetime",
+   "name": "MOD>SPACE",
+   "min": 0,
+   "max": 1,
+   "default": 0,
+   "dynamic_display": true
+  },
+  {
+   "key": "mod_decay",
+   "name": "MOD>DECAY",
+   "min": 0,
+   "max": 1,
+   "default": 0,
+   "dynamic_display": true
+  },
+  {
+   "key": "play",
+   "name": "PLAY",
+   "options": [
+    "GATE",
+    "DRONE"
+   ],
+   "default": 0
+  },
+  {
+   "key": "keytrack",
+   "name": "KEY TRACK",
+   "options": [
+    "OFF",
+    "ON"
+   ],
+   "default": 1
+  },
+  {
+   "key": "glide",
+   "name": "GLIDE",
+   "min": 0.0,
+   "max": 1.0,
+   "default": 0.0,
+   "dynamic_display": true
+  },
+  {
+   "key": "attack",
+   "name": "ATTACK",
+   "min": 0,
+   "max": 1,
+   "default": 0.3,
+   "dynamic_display": true
+  },
+  {
+   "key": "release",
+   "name": "RELEASE",
+   "min": 0,
+   "max": 1,
+   "default": 0.5,
+   "dynamic_display": true
+  },
+  {
+   "key": "filter_position",
+   "name": "FILTER POS",
+   "options": [
+    "PRE RESO",
+    "PRE ECHO",
+    "PRE AMB",
+    "LAST"
+   ],
+   "default": 0
+  },
+  {
+   "key": "sync",
+   "name": "SYNC",
+   "options": [
+    "OFF",
+    "BEAT",
+    "2 BEATS",
+    "BAR"
+   ],
+   "default": 0
+  },
+  {
+   "key": "volume",
+   "name": "VOLUME",
+   "min": 0,
+   "max": 1,
+   "default": 0.8,
+   "dynamic_display": true
+  }
+ ]
+}
