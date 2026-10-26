@@ -1,0 +1,93 @@
+--- a/Commons.h	2025-11-06 18:09:51.000000000 +0100
++++ b/Commons.h	2026-10-08 11:08:44.506924173 +0200
+@@ -365,7 +365,7 @@
+ inline float Max(float a, float b)
+ {
+     float r;
+-#ifdef __arm__
++#if defined(__arm__) && !defined(ONEIROI_PORTABLE_MINMAX)
+     asm("vmaxnm.f32 %[d], %[n], %[m]" : [d] "=t"(r) : [n] "t"(a), [m] "t"(b) :);
+ #else
+     r = (a > b) ? a : b;
+@@ -383,7 +383,7 @@
+ inline float Min(float a, float b)
+ {
+     float r;
+-#ifdef __arm__
++#if defined(__arm__) && !defined(ONEIROI_PORTABLE_MINMAX)
+     asm("vminnm.f32 %[d], %[n], %[m]" : [d] "=t"(r) : [n] "t"(a), [m] "t"(b) :);
+ #else
+     r = (a < b) ? a : b;
+--- a/Echo.h	2025-11-06 18:09:51.000000000 +0100
++++ b/Echo.h	2026-10-08 11:17:15.450685702 +0200
+@@ -40,6 +40,8 @@
+     float xi_;
+ 
+     bool externalClock_;
++
++    size_t lastClockSamples_;
+     bool infinite_;
+ 
+     void SetTapTime(int idx, float time)
+@@ -98,11 +100,14 @@
+         if (ClockSource::CLOCK_SOURCE_EXTERNAL == patchState_->clockSource)
+         {
+             int newIndex = densityQuantizer_.Process(value);
+-            if (newIndex == clockRatiosIndex_ && externalClock_)
++            // MPC port: also follow the clock when its period changes (upstream only recalculates the taps when
++            // DENSITY moves to another ratio, so the echo kept the tempo it was first given).
++            if (newIndex == clockRatiosIndex_ && externalClock_ && patchState_->clockSamples == lastClockSamples_)
+             {
+                 return;
+             }
+             clockRatiosIndex_ = newIndex;
++            lastClockSamples_ = patchState_->clockSamples;
+ 
+             float d = kModClockRatios[clockRatiosIndex_] * patchState_->clockSamples * kEchoExternalClockMultiplier;
+             for (size_t i = 0; i < kEchoTaps; i++)
+--- a/DelayLine.h	2025-11-06 18:09:51.000000000 +0100
++++ b/DelayLine.h	2026-10-08 11:20:39.186836062 +0200
+@@ -45,11 +45,18 @@
+ 
+     inline float readAt(int index)
+     {
+-        int i = writeIndex_ - index - 1;
++        // MPC port: unsigned arithmetic and a final wrap, so a delay outside the buffer (a tune or time pushed out of
++        // range by modulation) reads somewhere inside it instead of past its ends. On the module that read returns
++        // whatever memory is there; in a plugin it would take the host down.
++        int i = (int)((uint32_t)writeIndex_ - (uint32_t)index - 1u);
+         if (i < 0)
+         {
+             i += size_;
+         }
++        if ((uint32_t)i >= (uint32_t)size_)
++        {
++            i = (int)((uint32_t)i % (uint32_t)size_);
++        }
+ 
+         return Clamp(buffer_[i], -3.f, 3.f);
+     }
+--- a/LooperBuffer.h	2025-11-06 18:09:51.000000000 +0100
++++ b/LooperBuffer.h	2026-10-08 11:25:09.610410814 +0200
+@@ -236,6 +236,21 @@
+         float l0, l1;
+         float r0, r1;
+ 
++        // MPC port: bring the position into the buffer before it becomes an integer. A start pushed below zero
++        // arrives here as a huge unsigned number, and converting that (or a NaN) to int32_t is undefined.
++        if (!(p >= 0.f && p < (float)kLooperChannelBufferLength))
++        {
++            p = fmodf(p, (float)kLooperChannelBufferLength);
++            if (p < 0.f)
++            {
++                p += (float)kLooperChannelBufferLength;
++            }
++            if (!(p >= 0.f && p < (float)kLooperChannelBufferLength))
++            {
++                p = 0.f;
++            }
++        }
++
+         int32_t i = int32_t(p);
+ 
+         float f = p - i;

@@ -1,0 +1,13 @@
+https://github.com/Befaco/Oneiroi (the module's OWL patch, version 1.2.2 per CHANGELOG, Oneiroi_1_2_2Patch.hpp), from the owner's
+download of the main branch (Oneiroi-main.zip); by Roberto Noris (hirnlego), with Ewan Hemingway (hemmer). GPL-3.0-or-later
+(LICENSE; LICENSE_VCV.md adds a commercial licence for Befaco's VCV plugin, which does not apply here).
+vendored 2026-10-08: src/befaco/ = the originals, with four small changes (upstream-changes.diff):
+  Commons.h      the two ARMv8 assembler lines (vmaxnm / vminnm) can be switched off: -DONEIROI_PORTABLE_MINMAX (the MPC is ARMv7)
+  Echo.h         the taps are recalculated when an external clock's period changes, not only when DENSITY moves
+  DelayLine.h    a read outside the buffer wraps inside it (resonator and ambience delays pushed out of range by modulation)
+  LooperBuffer.h the read position is wrapped into the buffer before it is converted to an integer
+Ui.h, ParamController.h, Led.h, Midi.h and the patch class are kept for reference and not compiled: mpc/oneiroi_engine.cc
+stands in for them.
+src/owl/ = the parts of Rebel Technology's OWL library the patch is written against, unchanged:
+https://github.com/pingdynasty/OwlProgram commit 3942f8294df79f0456e41264cfa734645ba4fe90 (LibSource/, Source/; GPL-3.0-or-later, src/owl/LICENSE).
+mpc/ = the MPC engine (new, GPL-3.0-or-later): oneiroi_engine.cc; mi_engine.h (dev-tools/mi, MIT); engine.h (the framework's).

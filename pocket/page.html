@@ -1,0 +1,670 @@
+<meta charset="utf-8">
+<title>Oneiroi Pocket</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@400;600;700&family=Roboto+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one column for the phone – header with sound selector, the Force's four pages as tabs plus SOUNDS,
+   big drag tiles in a two-column grid, a keyboard pinned to the bottom. Single dark look: the Force skin's own palette. */
+:root {
+  --bg: #0c0c0d; --panel: #18181a; --panel-2: #202023; --line: #3a3a3f;
+  --ink: #f4f2ee; --ink-dim: #cfccc6; --ink-faint: #85827c;
+  --accent: #c8322c; --accent-hi: #f0524a; --key: #efede8; --key-ink: #18181a;
+  --display: "Titillium Web", "Segoe UI", system-ui, sans-serif;
+  --mono: "Roboto Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  color-scheme: dark;
+}
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+body { background: var(--bg); color: var(--ink); font-family: var(--display); -webkit-tap-highlight-color: transparent; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.app { max-width: 760px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 12px 250px; display: flex; flex-direction: column; gap: 14px; }
+button { font: inherit; color: inherit; }
+button:focus-visible, select:focus-visible, input:focus-visible, .tile:focus-visible { outline: 2px solid var(--accent-hi); outline-offset: 2px; }
+
+header { display: grid; grid-template-columns: 1fr auto; gap: 10px 12px; align-items: center; }
+.brand { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.brand h1 { margin: 0; font-size: 26px; font-weight: 700; letter-spacing: 0.01em; line-height: 1; }
+.brand h1 b { color: var(--accent-hi); font-weight: 700; }
+.brand span { color: var(--ink-faint); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; }
+.power { min-height: 48px; padding: 0 18px; border-radius: 6px; border: 1px solid var(--accent); background: var(--accent); color: #fff; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 10px; }
+.power.on { background: transparent; color: var(--accent-hi); }
+.led { width: 9px; height: 9px; border-radius: 50%; background: #3a1210; box-shadow: inset 0 0 0 1px #00000060; }
+.power.on .led { background: var(--accent-hi); box-shadow: 0 0 8px var(--accent-hi); }
+.soundrow { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr auto auto; gap: 8px; }
+select, .ctl { min-height: 48px; border-radius: 6px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); font-family: var(--display); font-size: 16px; font-weight: 600; padding: 0 12px; }
+select { width: 100%; min-width: 0; }
+.ctl { cursor: pointer; letter-spacing: 0.08em; text-transform: uppercase; font-size: 13px; }
+.ctl:active { background: var(--panel-2); }
+.ctl[disabled] { opacity: 0.4; cursor: default; }
+.meter { grid-column: 1 / -1; height: 4px; background: var(--panel); border-radius: 2px; overflow: hidden; }
+.meter i { display: block; height: 100%; width: 0; background: var(--accent-hi); transition: width 60ms linear; }
+
+nav { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); padding-block: 6px; }
+nav button { min-height: 44px; border: 0; border-bottom: 2px solid var(--line); background: transparent; color: var(--ink-faint); font-weight: 700; font-size: 13px; letter-spacing: 0.1em; cursor: pointer; }
+nav button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent-hi); }
+
+.frame { border: 1px solid var(--line); border-radius: 8px; background: var(--panel); padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+.frame h2 { margin: 0; font-size: 13px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; padding-bottom: 6px; border-bottom: 2px solid var(--accent); }
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.grid .wide { grid-column: 1 / -1; }
+@media (min-width: 560px) { .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.page { display: flex; flex-direction: column; gap: 12px; }
+
+/* drag tile: swipe sideways to set, double-tap for the default */
+.tile { position: relative; min-height: 68px; border-radius: 6px; background: var(--bg); border: 1px solid var(--line); overflow: hidden; touch-action: pan-y; user-select: none; -webkit-user-select: none; cursor: ew-resize; padding: 8px 10px; display: flex; flex-direction: column; justify-content: space-between; }
+.tile .fill { position: absolute; top: 0; bottom: 0; background: linear-gradient(90deg, #c8322c33, #f0524a55); border-right: 2px solid var(--accent-hi); pointer-events: none; }
+.tile.bip .fill { border-right: 0; }
+.tile.bip .fill.neg { border-left: 2px solid var(--accent-hi); }
+.tile.bip .fill.pos { border-right: 2px solid var(--accent-hi); }
+.tile .lab, .tile .val { position: relative; pointer-events: none; }
+.tile .lab { font-size: 12px; font-weight: 700; letter-spacing: 0.1em; color: var(--ink-dim); text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tile .val { font-family: var(--mono); font-size: 18px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.tile.drag { border-color: var(--accent-hi); }
+
+.seg { display: flex; flex-direction: column; gap: 6px; }
+.seg .lab { font-size: 12px; font-weight: 700; letter-spacing: 0.1em; color: var(--ink-dim); text-transform: uppercase; }
+.seg .opts { display: grid; grid-template-columns: repeat(var(--n, 2), minmax(0, 1fr)); gap: 4px; }
+.seg button { min-height: 44px; border-radius: 5px; border: 0; background: #242427; color: var(--ink-dim); font-weight: 700; font-size: 12px; letter-spacing: 0.06em; cursor: pointer; padding: 0 4px; }
+.seg button[aria-pressed="true"] { background: var(--accent-hi); color: var(--bg); }
+.step { grid-column: 1 / -1; display: grid; grid-template-columns: 52px 1fr 52px; align-items: stretch; gap: 4px; min-height: 68px; }
+.step button { border-radius: 6px; border: 1px solid var(--line); background: #242427; font-size: 24px; font-weight: 700; cursor: pointer; }
+.step .mid { border-radius: 6px; border: 1px solid var(--line); background: var(--bg); display: flex; flex-direction: column; justify-content: center; align-items: center; }
+.step .mid .lab { font-size: 12px; font-weight: 700; letter-spacing: 0.1em; color: var(--ink-dim); }
+.step .mid .val { font-family: var(--mono); font-size: 20px; }
+.btn { min-height: 68px; border-radius: 6px; border: 1px solid var(--line); background: #242427; font-weight: 700; letter-spacing: 0.12em; font-size: 14px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; }
+.btn[aria-pressed="true"] { border-color: var(--accent-hi); color: var(--accent-hi); }
+.btn[aria-pressed="true"] .led { background: var(--accent-hi); box-shadow: 0 0 8px var(--accent-hi); }
+.btn:active { background: var(--panel-2); }
+.note { margin: 0; color: var(--ink-faint); font-size: 14px; line-height: 1.45; max-width: 62ch; }
+.note b { color: var(--ink-dim); }
+
+/* sounds page */
+.saverow { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+.saverow input { min-height: 48px; border-radius: 6px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); font: 600 16px var(--display); padding: 0 12px; min-width: 0; }
+.list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.list li { display: grid; grid-template-columns: 1fr auto auto; gap: 6px; align-items: center; background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 6px 6px 6px 12px; }
+.list li .nm { font-weight: 600; font-size: 16px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.list li .ctl { min-height: 44px; }
+.empty { color: var(--ink-faint); font-size: 14px; padding: 8px 0; }
+textarea { width: 100%; min-height: 150px; border-radius: 6px; border: 1px solid var(--line); background: var(--bg); color: var(--ink-dim); font: 12px/1.5 var(--mono); padding: 10px; box-sizing: border-box; resize: vertical; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; }
+.toast { position: fixed; left: 50%; bottom: calc(240px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 6px; font-weight: 600; font-size: 14px; z-index: 30; max-width: calc(100% - 48px); }
+
+/* keyboard */
+.keys { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; background: #070708; border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom, 0px); padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px); }
+.keybar { max-width: 760px; margin: 0 auto; display: grid; grid-template-columns: auto auto 1fr auto; gap: 6px; align-items: center; padding: 8px max(16px, env(safe-area-inset-left, 0px)) 6px; }
+.keybar .ctl { min-height: 40px; padding: 0 12px; }
+.keybar .oct { font-family: var(--mono); color: var(--ink-dim); font-size: 14px; text-align: center; }
+.keybar .ctl[aria-pressed="true"] { border-color: var(--accent-hi); color: var(--accent-hi); }
+.kb { position: relative; max-width: 760px; margin: 0 auto; height: 150px; touch-action: none; user-select: none; -webkit-user-select: none; }
+.kb .w, .kb .b { position: absolute; top: 0; box-sizing: border-box; }
+.kb .w { height: 100%; background: var(--key); border: 1px solid #000; border-radius: 0 0 6px 6px; }
+.kb .b { height: 60%; background: #1c1c1f; border: 1px solid #000; border-radius: 0 0 4px 4px; z-index: 2; }
+.kb .on.w { background: #f6b3ae; }
+.kb .on.b { background: var(--accent); }
+.kb .w span { position: absolute; bottom: 6px; left: 0; right: 0; text-align: center; font: 600 11px var(--mono); color: #85827c; }
+@media (prefers-reduced-motion: reduce) { .meter i { transition: none; } }
+</style>
+
+<div class="app">
+  <header>
+    <div class="brand"><h1>Oneiroi <b>Pocket</b></h1><span>Befaco-Engine · 44,1 kHz</span></div>
+    <button class="power" id="power" type="button"><i class="led"></i><span id="powerTxt">Ton an</span></button>
+    <div class="soundrow">
+      <select id="preset" aria-label="Sound wählen"></select>
+      <button class="ctl" id="rand" type="button" title="Zufälliger Sound">Zufall</button>
+      <button class="ctl" id="undo" type="button" disabled title="Letzten Sound zurückholen">Zurück</button>
+    </div>
+    <div class="meter" aria-hidden="true"><i id="meter"></i></div>
+  </header>
+
+  <nav role="tablist" id="tabs"></nav>
+  <main id="pages"></main>
+</div>
+
+<div class="keys">
+  <div class="keybar">
+    <button class="ctl" id="octDown" type="button" aria-label="Oktave tiefer">−</button>
+    <button class="ctl" id="octUp" type="button" aria-label="Oktave höher">+</button>
+    <div class="oct" id="octTxt">C3–C4</div>
+    <button class="ctl" id="hold" type="button" aria-pressed="false">Hold</button>
+  </div>
+  <div class="kb" id="kb"></div>
+</div>
+
+<script type="module">
+const WASM_B64 = "%%WASM%%";
+const FACTORY = %%PRESETS%%;
+
+// ---------- the Force's pages, as in layout.conf ----------
+const PAGES = [
+  { id: "oneiroi", name: "ONEIROI", frames: [
+    { title: "Oszillatoren", items: ["tune", ["octave", "step"], "detune", "unison", ["osc2_type", "seg"]] },
+    { title: "Pegel", items: ["sine_vol", "osc2_vol", "looper_vol", "input_vol"] },
+    { title: "Looper", items: ["looper_speed", "looper_start", "looper_length", "looper_sos", "looper_filter", ["record", "toggle"], ["clear", "button"], ["looper_source", "seg"]] },
+    { title: "Eingang", input: true },
+  ]},
+  { id: "effects", name: "EFFECTS", frames: [
+    { title: "Filter", items: ["filter_vol", "cutoff", "resonance", ["filter_mode", "seg", 4]] },
+    { title: "Resonator", items: ["reso_vol", "reso_tune", "reso_feedback", "dissonance"] },
+    { title: "Echo", items: ["echo_vol", "echo_density", "echo_repeats", "echo_filter"] },
+    { title: "Ambience", items: ["ambience_vol", "spacetime", "decay", "autopan"] },
+  ]},
+  { id: "mod", name: "MOD", frames: [
+    { title: "Modulation", items: ["mod_level", "mod_speed", ["mod_type", "seg", 4]] },
+    { title: "Mod › Quellen", items: ["mod_pitch", "mod_detune", "mod_speed_amt", "mod_start", "mod_length"] },
+    { title: "Mod › Effekte", items: ["mod_cutoff", "mod_resonance", "mod_reso_tune", "mod_feedback", "mod_density", "mod_repeats", "mod_spacetime", "mod_decay"] },
+  ]},
+  { id: "play", name: "PLAY", frames: [
+    { title: "Tasten", items: [["play", "seg"], ["keytrack", "toggle"], "glide", "attack", "release"] },
+    { title: "Setup", items: [["filter_position", "seg", 2], ["sync", "seg", 2], "volume", ["bpm", "bpm"]] },
+  ]},
+  { id: "sounds", name: "SOUNDS", sounds: true },
+];
+const LABEL = {
+  tune: "Tune", octave: "Octave", detune: "Detune", unison: "Unison", osc2_type: "Osc 2", sine_vol: "Sine Vol", osc2_vol: "Osc 2 Vol",
+  looper_vol: "Looper Vol", input_vol: "In Vol", looper_speed: "Speed", looper_start: "Start", looper_length: "Length", looper_sos: "SOS",
+  looper_filter: "Loop Filter", record: "Record", clear: "Clear", looper_source: "Loop Source", filter_vol: "Filter Vol", cutoff: "Cutoff",
+  resonance: "Resonance", filter_mode: "Filter Mode", reso_vol: "Reso Vol", reso_tune: "Reso Tune", reso_feedback: "Reso Fdbk",
+  dissonance: "Dissonance", echo_vol: "Echo Vol", echo_density: "Density", echo_repeats: "Repeats", echo_filter: "Echo Filter",
+  ambience_vol: "Amb Vol", spacetime: "Spacetime", decay: "Decay", autopan: "Auto Pan", mod_level: "Mod Level", mod_speed: "Mod Speed",
+  mod_type: "Mod Type", mod_pitch: "› Pitch", mod_detune: "› Detune", mod_speed_amt: "› Speed", mod_start: "› Start", mod_length: "› Length",
+  mod_cutoff: "› Cutoff", mod_resonance: "› Reso", mod_reso_tune: "› R Tune", mod_feedback: "› R Fdbk", mod_density: "› Density",
+  mod_repeats: "› Repeats", mod_spacetime: "› Space", mod_decay: "› Decay", play: "Play", keytrack: "Key Track", glide: "Glide",
+  attack: "Attack", release: "Release", filter_position: "Filter Pos", sync: "Sync", volume: "Volume",
+};
+const SHORT_OPT = { "PRE RESO": "PRE RESO", "PRE ECHO": "PRE ECHO", "PRE AMB": "PRE AMB" };
+
+// ---------- engine: compiled once on the main thread for the parameter table, again inside the worklet for sound ----------
+const wasmBytes = Uint8Array.from(atob(WASM_B64), c => c.charCodeAt(0));
+const stubWasi = () => new Proxy({}, { get: () => () => 0 });
+const meta = await (async () => {
+  const { instance: inst } = await WebAssembly.instantiate(wasmBytes, { wasi_snapshot_preview1: stubWasi() });
+  const e = inst.exports; if (e._initialize) e._initialize(); e.pk_init();
+  const txt = n => new TextDecoder().decode(new Uint8Array(e.memory.buffer, e.pk_text(), n));
+  const params = [];
+  for (let i = 0; i < e.pk_count(); i++) {
+    const p = { i, key: txt(e.pk_key(i)), min: e.pk_min(i), max: e.pk_max(i), def: e.pk_def(i), int: !!e.pk_integer(i), opts: [] };
+    for (let o = 0; o < e.pk_nopts(i); o++) p.opts.push(txt(e.pk_opt(i, o)));
+    params.push(p);
+  }
+  return { e, txt, params };
+})();
+const P = Object.fromEntries(meta.params.map(p => [p.key, p]));
+const values = Object.fromEntries(meta.params.map(p => [p.key, p.def]));
+let bpm = 120;
+let store = null, uid = null, listEl, statusEl, exportTa;   // the SOUNDS page (built with the other pages)
+
+// display text, as the Force's screen shows it (computed by the same engine code on a silent instance)
+function displayOf(key) {
+  const p = P[key];
+  if (p.opts.length) return p.opts[Math.round(values[key])];
+  meta.e.pk_set(p.i, values[key]);
+  const n = meta.e.pk_display(p.i);
+  if (n > 0) return meta.txt(n);
+  return p.int ? String(Math.round(values[key])) : Math.round(values[key] * 100) + " %";
+}
+
+// ---------- audio ----------
+// One engine core, used in the AudioWorklet (normal case) or, if a browser refuses the worklet, in a ScriptProcessor.
+const CORE = `function makeCore(e, opts) {
+  const mem = e.memory; let inL = null, inR = null, inPos = 0, inOn = false;
+  if (e._initialize) e._initialize(); e.pk_init();
+  for (const [i, v] of opts.values) e.pk_set(i, v);
+  e.pk_tempo(opts.bpm);
+  return {
+    msg(m) {
+      if (m.t === "set") e.pk_set(m.i, m.v);
+      else if (m.t === "all") for (const [i, v] of m.values) e.pk_set(i, v);
+      else if (m.t === "midi") e.pk_midi(m.a, m.b, m.c);
+      else if (m.t === "tempo") e.pk_tempo(m.bpm);
+      else if (m.t === "input") { inL = m.l; inR = m.r; inPos = 0; }
+      else if (m.t === "inputOn") inOn = m.on;
+    },
+    render(outL, outR, off, N) {   // N <= 128; returns the block's peak
+      const has = inOn && inL && inL.length > 0;
+      if (has) {
+        const il = new Float32Array(mem.buffer, e.pk_in_l(), N), ir = new Float32Array(mem.buffer, e.pk_in_r(), N);
+        for (let i = 0; i < N; i++) { il[i] = inL[inPos]; ir[i] = inR[inPos]; if (++inPos >= inL.length) inPos = 0; }
+      }
+      e.pk_process(N, has ? 1 : 0);
+      const ol = new Float32Array(mem.buffer, e.pk_out_l(), N), or = new Float32Array(mem.buffer, e.pk_out_r(), N);
+      outL.set(ol, off); if (outR) outR.set(or, off);
+      let pk = 0; for (let i = 0; i < N; i++) { const a = Math.abs(ol[i]); if (a > pk) pk = a; }
+      return pk;
+    },
+  };
+}`;
+const WORKLET = CORE + `
+class OneiroiProc extends AudioWorkletProcessor {
+  constructor(o) {
+    super();
+    const stub = new Proxy({}, { get: () => () => 0 });
+    const inst = new WebAssembly.Instance(new WebAssembly.Module(o.processorOptions.wasm), { wasi_snapshot_preview1: stub });
+    this.core = makeCore(inst.exports, o.processorOptions); this.peak = 0; this.n = 0;
+    this.port.onmessage = ({ data }) => this.core.msg(data);
+  }
+  process(_, outputs) {
+    const out = outputs[0];
+    this.peak = Math.max(this.peak, this.core.render(out[0], out[1], 0, out[0].length));
+    if (++this.n >= 16) { this.port.postMessage(this.peak); this.peak = 0; this.n = 0; }
+    return true;
+  }
+}
+registerProcessor("oneiroi", OneiroiProc);`;
+
+let ctx = null, node = null, core = null, inputBuf = null, inputOn = false;
+async function startAudio() {
+  ctx = new AudioContext({ sampleRate: 44100, latencyHint: "interactive" });
+  const opts = { wasm: wasmBytes.buffer.slice(0), values: allValues(), bpm };
+  try {
+    const url = URL.createObjectURL(new Blob([WORKLET], { type: "text/javascript" }));
+    await ctx.audioWorklet.addModule(url);
+    node = new AudioWorkletNode(ctx, "oneiroi", { numberOfInputs: 0, outputChannelCount: [2], processorOptions: opts });
+    node.port.onmessage = ({ data }) => { meterEl.style.width = Math.min(100, data * 100) + "%"; };
+    node.onprocessorerror = () => toast("Die Klangerzeugung ist abgestürzt. Seite neu laden.");
+  } catch {   // no worklet here: the same engine on the page's own thread
+    const { instance } = await WebAssembly.instantiate(wasmBytes, { wasi_snapshot_preview1: stubWasi() });
+    core = new Function(CORE + "; return makeCore;")()(instance.exports, opts);
+    node = ctx.createScriptProcessor(1024, 0, 2);
+    let n = 0, peak = 0;
+    node.onaudioprocess = ev => {
+      const L = ev.outputBuffer.getChannelData(0), R = ev.outputBuffer.getChannelData(1);
+      for (let off = 0; off < L.length; off += 128) peak = Math.max(peak, core.render(L, R, off, Math.min(128, L.length - off)));
+      if (++n >= 2) { meterEl.style.width = Math.min(100, peak * 100) + "%"; peak = 0; n = 0; }
+    };
+  }
+  node.connect(ctx.destination);
+  if (inputBuf) sendInput();
+  send({ t: "inputOn", on: inputOn });
+}
+const send = m => { if (core) core.msg(m); else if (node && node.port) node.port.postMessage(m); };
+const allValues = () => meta.params.map(p => [p.i, values[p.key]]);
+
+const powerBtn = document.getElementById("power"), powerTxt = document.getElementById("powerTxt"), meterEl = document.getElementById("meter");
+powerBtn.addEventListener("click", async () => {
+  try {
+    if (!ctx) { try { await startAudio(); } catch (err) { if (ctx) ctx.close(); ctx = node = core = null; throw err; } }
+    else if (ctx.state === "running") await ctx.suspend(); else await ctx.resume();
+    const on = ctx.state === "running";
+    powerBtn.classList.toggle("on", on); powerTxt.textContent = on ? "Ton aus" : "Ton an";
+    if (!on) meterEl.style.width = "0";
+    keepAwake(on);
+  } catch (err) { toast("Audio ließ sich nicht starten: " + (err.message || err)); }
+});
+let wake = null;
+async function keepAwake(on) {
+  try { if (on && "wakeLock" in navigator) wake = await navigator.wakeLock.request("screen"); else if (wake) { await wake.release(); wake = null; } } catch {}
+}
+
+// ---------- parameter changes ----------
+const views = {};   // key -> [update functions]
+function setValue(key, v, quiet) {
+  const p = P[key];
+  v = Math.min(p.max, Math.max(p.min, v));
+  if (p.int || p.opts.length) v = Math.round(v);
+  values[key] = v;
+  send({ t: "set", i: p.i, v });
+  (views[key] || []).forEach(f => f());
+  if (!quiet) markEdited();
+}
+function applySound(vals) {
+  for (const p of meta.params) {
+    if (p.key === "clear") continue;
+    let v = vals[p.key];
+    if (v === undefined) v = p.def;
+    if (typeof v === "string") { const k = p.opts.indexOf(v.toUpperCase()); v = k >= 0 ? k : p.def; }
+    values[p.key] = Math.min(p.max, Math.max(p.min, v));
+  }
+  send({ t: "all", values: allValues() });
+  Object.values(views).flat().forEach(f => f());
+}
+function soundValues() {   // a sound as the Force's presets write it: option words, numbers rounded
+  const out = {};
+  for (const p of meta.params) {
+    if (p.key === "clear") continue;
+    out[p.key] = p.opts.length ? p.opts[Math.round(values[p.key])] : (p.int ? Math.round(values[p.key]) : +values[p.key].toFixed(3));
+  }
+  return out;
+}
+
+// ---------- controls ----------
+function el(tag, cls, html) { const n = document.createElement(tag); if (cls) n.className = cls; if (html != null) n.innerHTML = html; return n; }
+function tile(key) {
+  const p = P[key], bip = p.min < 0;
+  const t = el("div", "tile" + (bip ? " bip" : "")); t.tabIndex = 0;
+  t.setAttribute("role", "slider"); t.setAttribute("aria-label", LABEL[key]);
+  const fill = el("div", "fill"), lab = el("div", "lab", LABEL[key]), val = el("div", "val");
+  t.append(fill, lab, val);
+  const update = () => {
+    const n = (values[key] - p.min) / (p.max - p.min);
+    if (bip) {
+      const c = -p.min / (p.max - p.min);
+      fill.className = "fill " + (n < c ? "neg" : "pos");
+      fill.style.left = Math.min(n, c) * 100 + "%"; fill.style.width = Math.abs(n - c) * 100 + "%";
+    } else { fill.style.left = "0"; fill.style.width = n * 100 + "%"; }
+    val.textContent = displayOf(key);
+    t.setAttribute("aria-valuetext", val.textContent);
+  };
+  (views[key] ||= []).push(update); update();
+  let start = null, lastTap = 0;
+  t.addEventListener("pointerdown", ev => {
+    const now = performance.now();
+    if (now - lastTap < 300) { setValue(key, p.def); lastTap = 0; return; }
+    lastTap = now;
+    start = { x: ev.clientX, y: ev.clientY, v: values[key], id: ev.pointerId, moved: false };
+  });
+  t.addEventListener("pointermove", ev => {
+    if (!start || ev.pointerId !== start.id) return;
+    const dx = ev.clientX - start.x, dy = ev.clientY - start.y;
+    if (!start.moved) {
+      if (Math.abs(dy) > 10 && Math.abs(dy) > Math.abs(dx)) { start = null; return; }   // a scroll, not a turn
+      if (Math.abs(dx) < 6) return;
+      start.moved = true; t.setPointerCapture(ev.pointerId); t.classList.add("drag"); lastTap = 0;
+    }
+    const w = t.getBoundingClientRect().width * 1.6;   // a little more than the tile's width = full range
+    setValue(key, start.v + dx / w * (p.max - p.min));
+  });
+  const end = () => { start = null; t.classList.remove("drag"); };
+  t.addEventListener("pointerup", end); t.addEventListener("pointercancel", end);
+  t.addEventListener("keydown", ev => {
+    const s = (p.max - p.min) / (ev.shiftKey ? 100 : 25);
+    if (ev.key === "ArrowRight" || ev.key === "ArrowUp") { setValue(key, values[key] + s); ev.preventDefault(); }
+    if (ev.key === "ArrowLeft" || ev.key === "ArrowDown") { setValue(key, values[key] - s); ev.preventDefault(); }
+  });
+  return t;
+}
+function seg(key, cols) {
+  const p = P[key], w = el("div", "seg wide");
+  w.append(el("div", "lab", LABEL[key]));
+  const opts = el("div", "opts"); opts.style.setProperty("--n", cols || p.opts.length);
+  const btns = p.opts.map((o, k) => { const b = el("button", null, SHORT_OPT[o] || o); b.type = "button"; b.onclick = () => setValue(key, k); opts.append(b); return b; });
+  w.append(opts);
+  const update = () => btns.forEach((b, k) => b.setAttribute("aria-pressed", String(Math.round(values[key]) === k)));
+  (views[key] ||= []).push(update); update();
+  return w;
+}
+function stepper(key) {
+  const p = P[key], w = el("div", "step");
+  const dn = el("button", null, "−"), up = el("button", null, "+"), mid = el("div", "mid");
+  dn.type = up.type = "button"; dn.setAttribute("aria-label", LABEL[key] + " tiefer"); up.setAttribute("aria-label", LABEL[key] + " höher");
+  const lab = el("div", "lab", LABEL[key].toUpperCase()), val = el("div", "val"); mid.append(lab, val);
+  dn.onclick = () => setValue(key, values[key] - 1); up.onclick = () => setValue(key, values[key] + 1);
+  w.append(dn, mid, up);
+  const update = () => { val.textContent = Math.round(values[key]); };
+  (views[key] ||= []).push(update); update();
+  return w;
+}
+function toggle(key) {
+  const b = el("button", "btn", `<i class="led"></i>${LABEL[key].toUpperCase()}`); b.type = "button";
+  b.onclick = () => setValue(key, values[key] > 0.5 ? 0 : 1);
+  const update = () => b.setAttribute("aria-pressed", String(values[key] > 0.5));
+  (views[key] ||= []).push(update); update();
+  return b;
+}
+function momentary(key) {
+  const b = el("button", "btn", LABEL[key].toUpperCase()); b.type = "button";
+  b.onclick = () => { send({ t: "set", i: P[key].i, v: 1 }); toast("Looper geleert"); };
+  return b;
+}
+function bpmStepper() {
+  const w = el("div", "step");
+  const dn = el("button", null, "−"), up = el("button", null, "+"), mid = el("div", "mid");
+  dn.type = up.type = "button"; dn.setAttribute("aria-label", "Tempo langsamer"); up.setAttribute("aria-label", "Tempo schneller");
+  const val = el("div", "val"); mid.append(el("div", "lab", "TEMPO"), val);
+  const upd = () => { val.textContent = bpm + " BPM"; send({ t: "tempo", bpm }); };
+  let timer = null;
+  const hold = d => { bpm = Math.min(220, Math.max(40, bpm + d)); upd(); timer = setTimeout(() => hold(d), timer ? 60 : 400); };
+  for (const [b, d] of [[dn, -1], [up, 1]]) {
+    b.addEventListener("pointerdown", () => { timer = null; hold(d); });
+    ["pointerup", "pointerleave", "pointercancel"].forEach(t => b.addEventListener(t, () => { clearTimeout(timer); timer = null; }));
+  }
+  w.append(dn, mid, up); upd();
+  return w;
+}
+function inputFrame(f) {
+  f.append(el("p", "note", "Der Insert-Eingang der Force ist hier eine <b>Audiodatei in Schleife</b>: laden, einschalten, IN VOL aufdrehen. Mit LOOP SOURCE = INPUT nimmt RECORD die Datei auf."));
+  const row = el("div", "grid");
+  const pick = el("label", "btn", "DATEI LADEN"); pick.style.cursor = "pointer";
+  const file = el("input"); file.type = "file"; file.accept = "audio/*"; file.hidden = true; pick.append(file);
+  const on = el("button", "btn", '<i class="led"></i>EINGANG'); on.type = "button";
+  const name = el("p", "note wide", "Keine Datei geladen.");
+  const upd = () => on.setAttribute("aria-pressed", String(inputOn));
+  on.onclick = () => { if (!inputBuf) { toast("Erst eine Audiodatei laden"); return; } inputOn = !inputOn; upd(); send({ t: "inputOn", on: inputOn }); };
+  file.onchange = async () => {
+    const fl = file.files[0]; if (!fl) return;
+    try {
+      const dec = new OfflineAudioContext(2, 44100, 44100);
+      const buf = await dec.decodeAudioData(await fl.arrayBuffer());
+      const l = buf.getChannelData(0), r = buf.numberOfChannels > 1 ? buf.getChannelData(1) : l;
+      inputBuf = { l: new Float32Array(l), r: new Float32Array(r) };
+      name.textContent = `${fl.name} · ${(buf.duration).toFixed(1)} s`;
+      inputOn = true; upd(); sendInput(); send({ t: "inputOn", on: true });
+      if (values.input_vol < 0.05) setValue("input_vol", 0.7);
+    } catch { toast("Diese Datei ließ sich nicht lesen. MP3, WAV oder M4A probieren."); }
+  };
+  upd(); row.append(pick, on, name); f.append(row);
+}
+function sendInput() { if (inputBuf) send({ t: "input", l: inputBuf.l.slice(0), r: inputBuf.r.slice(0) }); }
+
+// ---------- pages ----------
+const tabsEl = document.getElementById("tabs"), pagesEl = document.getElementById("pages");
+const pageEls = {};
+for (const pg of PAGES) {
+  const b = el("button", null, pg.name); b.type = "button"; b.setAttribute("role", "tab"); b.id = "tab-" + pg.id;
+  b.onclick = () => showPage(pg.id); tabsEl.append(b);
+  const sec = el("section", "page"); sec.setAttribute("role", "tabpanel"); sec.id = "page-" + pg.id; pageEls[pg.id] = sec;
+  if (pg.sounds) buildSounds(sec);
+  for (const fr of pg.frames || []) {
+    const f = el("div", "frame"); f.append(el("h2", null, fr.title));
+    if (fr.input) inputFrame(f);
+    else {
+      const g = el("div", "grid");
+      for (const it of fr.items) {
+        const [key, kind, cols] = Array.isArray(it) ? it : [it, "tile"];
+        g.append(kind === "seg" ? seg(key, cols) : kind === "step" ? stepper(key) : kind === "toggle" ? toggle(key)
+          : kind === "button" ? momentary(key) : kind === "bpm" ? bpmStepper() : tile(key));
+      }
+      f.append(g);
+    }
+    sec.append(f);
+  }
+  pagesEl.append(sec);
+}
+{
+  const hint = el("p", "note", "Kacheln seitlich wischen zum Einstellen, doppelt tippen für den Grundwert. Ohne gehaltene Taste klingt nur PLAY = DRONE.");
+  pageEls.oneiroi.prepend(hint);
+}
+function showPage(id) {
+  for (const pg of PAGES) {
+    document.getElementById("tab-" + pg.id).setAttribute("aria-selected", String(pg.id === id));
+    pageEls[pg.id].hidden = pg.id !== id;
+  }
+  try { localStorage.setItem("oneiroi-pocket-tab", id); } catch {}
+}
+let startTab = "oneiroi"; try { startTab = localStorage.getItem("oneiroi-pocket-tab") || startTab; } catch {}
+if (!pageEls[startTab]) startTab = "oneiroi";
+showPage(startTab);
+
+// ---------- sound selector, random, undo ----------
+const presetEl = document.getElementById("preset"), randBtn = document.getElementById("rand"), undoBtn = document.getElementById("undo");
+let mySounds = [];   // {id, name, values}
+let undoStack = [];
+function fillPresetSelect(selected) {
+  presetEl.innerHTML = "";
+  const g1 = el("optgroup"); g1.label = "Werkssounds (wie auf der Force)";
+  FACTORY.forEach((p, k) => { const o = el("option", null); o.value = "f" + k; o.textContent = p.name; g1.append(o); });
+  presetEl.append(g1);
+  if (mySounds.length) {
+    const g2 = el("optgroup"); g2.label = "Meine Sounds";
+    mySounds.forEach(s => { const o = el("option", null); o.value = "m" + s.id; o.textContent = s.name; g2.append(o); });
+    presetEl.append(g2);
+  }
+  const ed = el("option", null, "· bearbeitet ·"); ed.value = "edited"; ed.hidden = true; presetEl.append(ed);
+  presetEl.value = selected || "f0";
+}
+function pushUndo() { undoStack.push(soundValues()); if (undoStack.length > 20) undoStack.shift(); undoBtn.disabled = false; }
+presetEl.addEventListener("change", () => {
+  const v = presetEl.value;
+  pushUndo();
+  if (v[0] === "f") applySound(FACTORY[+v.slice(1)].values);
+  else if (v[0] === "m") { const s = mySounds.find(x => "m" + x.id === v); if (s) applySound(s.values); }
+});
+function markEdited() { if (presetEl.value !== "edited") presetEl.value = "edited"; }
+undoBtn.onclick = () => { const v = undoStack.pop(); if (v) { applySound(v); markEdited(); } undoBtn.disabled = !undoStack.length; };
+
+// Random, in the module's spirit: keep the levels in a playable range, leave volume, play mode and the looper buttons alone.
+randBtn.onclick = () => {
+  pushUndo();
+  const r = Math.random, keep = new Set(["volume", "play", "keytrack", "record", "clear", "input_vol", "looper_source", "sync", "octave", "tune"]);
+  const v = soundValues();
+  for (const p of meta.params) {
+    if (keep.has(p.key)) continue;
+    if (p.opts.length) v[p.key] = p.opts[Math.floor(r() * p.opts.length)];
+    else if (p.key.startsWith("mod_") && p.key !== "mod_level" && p.key !== "mod_speed") v[p.key] = r() < 0.55 ? 0 : +(r() * 0.7).toFixed(3);
+    else v[p.key] = +(p.min + r() * (p.max - p.min)).toFixed(3);
+  }
+  v.sine_vol = +(0.3 + r() * 0.6).toFixed(3); v.osc2_vol = +(0.2 + r() * 0.7).toFixed(3);
+  v.looper_vol = r() < 0.7 ? 0 : +(r() * 0.6).toFixed(3);
+  v.filter_vol = +(0.6 + r() * 0.4).toFixed(3); v.ambience_vol = +(0.3 + r() * 0.7).toFixed(3);
+  v.reso_vol = r() < 0.5 ? 0 : v.reso_vol; v.attack = +(r() * 0.6).toFixed(3); v.release = +(0.2 + r() * 0.6).toFixed(3);
+  v.looper_speed = 1;
+  applySound(v); markEdited();
+};
+
+// ---------- keyboard ----------
+const kb = document.getElementById("kb"), holdBtn = document.getElementById("hold"), octTxt = document.getElementById("octTxt");
+let base = 48, hold = false; const down = new Map(), latched = new Set();
+const NAMES = ["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"];
+function buildKeys() {
+  kb.innerHTML = "";
+  const whites = [0, 2, 4, 5, 7, 9, 11, 12], ww = 100 / whites.length;
+  whites.forEach((s, k) => { const d = el("div", "w"); d.style.left = k * ww + "%"; d.style.width = ww + "%"; d.dataset.n = base + s; d.append(el("span", null, s % 12 === 0 ? "C" + (Math.floor((base + s) / 12) - 1) : "")); kb.append(d); });
+  [[1, 1], [3, 2], [6, 4], [8, 5], [10, 6]].forEach(([s, k]) => { const d = el("div", "b"); d.style.left = (k * ww - ww * 0.32) + "%"; d.style.width = ww * 0.64 + "%"; d.dataset.n = base + s; kb.append(d); });
+  octTxt.textContent = `C${base / 12 - 1}–C${base / 12}`;
+  for (const n of latched) mark(n, true);
+}
+const mark = (n, on) => { const k = kb.querySelector(`[data-n="${n}"]`); if (k) k.classList.toggle("on", on); };
+const noteOn = n => { send({ t: "midi", a: 0x90, b: n, c: 100 }); mark(n, true); };
+const noteOff = n => { send({ t: "midi", a: 0x80, b: n, c: 0 }); mark(n, false); };
+const keyAt = (x, y) => { const t = document.elementFromPoint(x, y); const k = t && t.closest && t.closest("#kb [data-n]"); return k ? +k.dataset.n : null; };
+kb.addEventListener("pointerdown", ev => {
+  if (!ctx) { powerBtn.click(); }
+  const n = keyAt(ev.clientX, ev.clientY); if (n == null) return;
+  kb.setPointerCapture(ev.pointerId);
+  if (hold) { if (latched.has(n)) { latched.delete(n); noteOff(n); } else { latched.add(n); noteOn(n); } return; }
+  down.set(ev.pointerId, n); noteOn(n);
+});
+kb.addEventListener("pointermove", ev => {
+  if (hold || !down.has(ev.pointerId)) return;
+  const n = keyAt(ev.clientX, ev.clientY), o = down.get(ev.pointerId);
+  if (n != null && n !== o) { noteOn(n); noteOff(o); down.set(ev.pointerId, n); }
+});
+const up = ev => { if (!down.has(ev.pointerId)) return; const n = down.get(ev.pointerId); down.delete(ev.pointerId); if (![...down.values()].includes(n)) noteOff(n); };
+kb.addEventListener("pointerup", up); kb.addEventListener("pointercancel", up);
+document.getElementById("octDown").onclick = () => { if (base > 12) { allOff(); base -= 12; buildKeys(); } };
+document.getElementById("octUp").onclick = () => { if (base < 96) { allOff(); base += 12; buildKeys(); } };
+holdBtn.onclick = () => { hold = !hold; holdBtn.setAttribute("aria-pressed", String(hold)); if (!hold) allOff(); };
+function allOff() { for (const n of latched) noteOff(n); latched.clear(); for (const n of down.values()) noteOff(n); down.clear(); send({ t: "midi", a: 0xB0, b: 123, c: 0 }); }
+buildKeys();
+
+// ---------- my sounds: kept per viewer on claude.ai (db, private), else on this device ----------
+function buildSounds(sec) {
+  const f = el("div", "frame"); f.append(el("h2", null, "Sound speichern"));
+  const row = el("div", "saverow"); const inp = el("input"); inp.id = "soundName"; inp.placeholder = "Name, z. B. Goa Drone 1"; inp.maxLength = 40;
+  const sv = el("button", "ctl", "Speichern"); sv.type = "button";
+  sv.onclick = async () => { const nm = inp.value.trim(); if (!nm) { toast("Bitte einen Namen eingeben"); inp.focus(); return; } await saveSound(nm); inp.value = ""; };
+  row.append(inp, sv); f.append(row);
+  statusEl = el("p", "note", "Speicher wird verbunden …"); f.append(statusEl);
+  const f2 = el("div", "frame"); f2.append(el("h2", null, "Meine Sounds"));
+  listEl = el("ul", "list"); f2.append(listEl);
+  const f3 = el("div", "frame"); f3.append(el("h2", null, "Für die Force"));
+  f3.append(el("p", "note", "Der aktuelle Sound als Eintrag für <b>vst/presets.src.json</b> im Repo mpc-vst-oneiroi (nur die Werte, die vom Grundwert abweichen). Eintragen, <b>python3 vst/make_presets.py</b>, pushen: Nach dem Actions-Build steht er im PRESET-Menü der Force."));
+  exportTa = el("textarea"); exportTa.id = "exportJson"; exportTa.readOnly = true; f3.append(exportTa);
+  const r3 = el("div", "row"); const cp = el("button", "ctl", "Kopieren"), dl = el("button", "ctl", "Als Datei"); cp.type = dl.type = "button";
+  cp.onclick = async () => { refreshExport(); try { await navigator.clipboard.writeText(exportTa.value); toast("Kopiert"); } catch { exportTa.select(); toast("Text markiert: jetzt kopieren"); } };
+  dl.onclick = async () => {
+    refreshExport();
+    const d = window.claude ? await window.claude.use("downloads") : null;
+    if (!d) { exportTa.select(); toast("Speichern als Datei geht hier nicht. Text ist markiert."); return; }
+    try { await d.save({ filename: "oneiroi-" + (exportName() || "sound").replace(/[^a-z0-9-]+/gi, "-").toLowerCase() + ".json", data: exportTa.value }); }
+    catch (e) { if (e && e.code !== "declined") toast("Datei ließ sich nicht speichern"); }
+  };
+  r3.append(cp, dl); f3.append(r3);
+  sec.append(f, f2, f3);
+  sec.addEventListener("focusin", refreshExport);
+}
+function exportName() { const o = presetEl.selectedOptions[0]; return o && presetEl.value !== "edited" ? o.textContent : "Pocket Sound"; }
+function refreshExport() {
+  const vals = {}, cur = soundValues();
+  for (const p of meta.params) {
+    if (p.key === "clear" || p.key === "record" || p.key === "input_vol" || p.key === "looper_source") continue;
+    const def = p.opts.length ? p.opts[Math.round(p.def)] : (p.int ? Math.round(p.def) : +p.def.toFixed(3));
+    if (cur[p.key] !== def) vals[p.key] = cur[p.key];
+  }
+  exportTa.value = JSON.stringify({ name: exportName(), values: vals });
+}
+function renderList() {
+  listEl.innerHTML = "";
+  if (!mySounds.length) { listEl.append(el("li", "empty", "Noch keine eigenen Sounds. Oben einen Namen eingeben und speichern.")); listEl.firstChild.style.display = "block"; return; }
+  for (const s of mySounds) {
+    const li = el("li"); const nm = el("div", "nm"); nm.textContent = s.name;
+    const ld = el("button", "ctl", "Laden"), rm = el("button", "ctl", "Löschen"); ld.type = rm.type = "button";
+    ld.onclick = () => { pushUndo(); applySound(s.values); presetEl.value = "m" + s.id; toast(`„${s.name}“ geladen`); };
+    rm.onclick = () => {
+      if (rm.dataset.arm !== "1") { rm.dataset.arm = "1"; rm.textContent = "Sicher?"; setTimeout(() => { rm.dataset.arm = ""; rm.textContent = "Löschen"; }, 3000); return; }
+      deleteSound(s);
+    };
+    li.append(nm, ld, rm); listEl.append(li);
+  }
+}
+const LS = "oneiroi-pocket-sounds";
+function localLoad() { try { return JSON.parse(localStorage.getItem(LS) || "[]"); } catch { return []; } }
+function localSave() { try { localStorage.setItem(LS, JSON.stringify(mySounds)); } catch {} }
+async function initStore() {
+  mySounds = localLoad(); renderList(); fillPresetSelect();
+  try {
+    const [db, user] = await Promise.all([window.claude.use("db"), window.claude.use("user")]);
+    uid = user ? await user.id() : null;
+    if (db && uid) {
+      store = db.collection("data/users/" + uid + "/sounds");
+      statusEl.textContent = "Gespeichert in deinem claude.ai-Konto: auf jedem Gerät da, nur für dich sichtbar.";
+      store.orderBy("created", "asc").onSnapshot(snap => {
+        const cur = presetEl.value;
+        mySounds = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderList(); fillPresetSelect(cur);
+      }, () => { statusEl.textContent = "Konto-Speicher nicht erreichbar. Sounds bleiben auf diesem Gerät."; store = null; });
+      return;
+    }
+  } catch {}
+  statusEl.textContent = "Ohne Anmeldung: Sounds bleiben nur in diesem Browser.";
+}
+async function saveSound(name) {
+  const vals = soundValues(); delete vals.record;
+  if (store) {
+    const ref = store.doc();
+    try { await ref.set({ name, values: vals, created: Date.now() }); presetEl.value = "m" + ref.id; toast(`„${name}“ gespeichert`); }
+    catch { toast("Speichern hat nicht geklappt"); }
+  } else {
+    const s = { id: String(Date.now()), name, values: vals }; mySounds.push(s); localSave(); renderList(); fillPresetSelect("m" + s.id); toast(`„${name}“ gespeichert`);
+  }
+  refreshExport();
+}
+async function deleteSound(s) {
+  if (store) { try { await store.doc(s.id).delete(); } catch { toast("Löschen hat nicht geklappt"); } }
+  else { mySounds = mySounds.filter(x => x !== s); localSave(); renderList(); fillPresetSelect(); }
+}
+
+let toastTimer = null;
+function toast(msg) {
+  let t = document.querySelector(".toast"); if (!t) { t = el("div", "toast"); t.setAttribute("role", "status"); document.body.append(t); }
+  t.textContent = msg; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; }, 2200);
+}
+
+applySound(FACTORY[1].values);   // opens on "Dream Pad", a sound that rewards the first key press
+fillPresetSelect("f1");
+if (window.claude && window.claude.use) initStore(); else { mySounds = localLoad(); renderList(); fillPresetSelect("f1"); statusEl.textContent = "Ohne Anmeldung: Sounds bleiben nur in diesem Browser."; }
+refreshExport();
+window.oneiroiPocket = { values, get audio() { return ctx && ctx.state; } };   // for tests and the console
+</script>
