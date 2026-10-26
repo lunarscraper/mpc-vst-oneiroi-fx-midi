@@ -1,0 +1,37 @@
+# Every push and pull request: build both plugins, run the offline test and package them (no release).
+# The zips and skin previews are in the run's artifacts.
+name: Build
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  oneiroi:
+    uses: sd88me/mpc-vst-plugins/.github/workflows/vst-release.yml@28da1ce2a75f33b5ef802d0fadb0293862aed8a5
+    with:
+      tools_ref: 28da1ce2a75f33b5ef802d0fadb0293862aed8a5
+      tag: oneiroi-vst-dev
+      version: 1.1.0-dev
+      vst_dir: vst
+      build: '"$MPC_VST/tools/build_port.sh" vst/vst.json armv7'
+      host_test: '"$MPC_VST/tools/test_port.sh" vst/vst.json'
+      about: Befaco Oneiroi (ambient / drone synth) as an MPC OS instrument, from the module's own code
+      plugin_id: oneiroi
+      license: GPL-3.0-or-later
+      dry_run: true
+
+  oneiroi-fx:
+    uses: sd88me/mpc-vst-plugins/.github/workflows/vst-release.yml@28da1ce2a75f33b5ef802d0fadb0293862aed8a5
+    with:
+      tools_ref: 28da1ce2a75f33b5ef802d0fadb0293862aed8a5
+      tag: oneiroi-fx-vst-dev
+      version: 1.1.0-dev
+      vst_dir: vst-fx
+      build: '"$MPC_VST/tools/build_port.sh" vst-fx/vst.json armv7'
+      host_test: '"$MPC_VST/tools/test_port.sh" vst-fx/vst.json'
+      about: Befaco Oneiroi as an MPC OS insert effect with audio input and its own MIDI input port
+      plugin_id: oneiroi-fx
+      license: GPL-3.0-or-later
+      dry_run: true
